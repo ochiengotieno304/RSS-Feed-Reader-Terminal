@@ -1,5 +1,4 @@
 require 'open-uri'
-require 'uri'
 require 'net/http'
 require 'nokogiri'
 require 'multi_xml'
@@ -17,9 +16,17 @@ response = Net::HTTP.get(uri)
 # parse the XML using Nokogiri
 doc = MultiXml.parse(response) 
 
-title = doc['rss']['channel']['title']
-description = doc['rss']['channel']['description']
+doc1 = doc['rss']['channel']
+title = doc['rss']['channel']['description']
 
 puts 'Title: ' + title
-puts 'Description: ' + description
-puts 'Link: ' + url
+puts ''
+
+# iterate through the first <item> tag
+doc1.each do |name, content|
+    if name == 'item'
+        puts "Description: #{content[0]['title']}"
+        puts ''
+        puts "Link: #{content[0]['link']}"
+    end
+end
