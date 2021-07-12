@@ -11,22 +11,27 @@ url = gets.chomp
 uri = URI(url)
 
 # initialize response with the uri
-response = Net::HTTP.get(uri)
+begin
+    response = Net::HTTP.get(uri)
 
-# parse the XML using Nokogiri
-doc = MultiXml.parse(response) 
+rescue SystemCallError => e
+    p 'Invalid rss or no internet connection'
+else
+    # parse the XML using Nokogiri
+    doc = MultiXml.parse(response) 
 
-doc1 = doc['rss']['channel']
-title = doc['rss']['channel']['description']
+    doc1 = doc['rss']['channel']
+    title = doc['rss']['channel']['description']
 
-puts 'Title: ' + title
-puts ''
+    puts 'Title: ' + title
+    puts ''
 
-# iterate through the first <item> tag
-doc1.each do |name, content|
-    if name == 'item'
-        puts "Description: #{content[0]['title']}"
-        puts ''
-        puts "Link: #{content[0]['link']}"
+    # iterate through the first <item> tag
+    doc1.each do |name, content|
+        if name == 'item'
+            puts "Description: #{content[0]['title']}"
+            puts ''
+            puts "Link: #{content[0]['link']}"
+        end
     end
 end
